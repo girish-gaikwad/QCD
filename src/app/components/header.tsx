@@ -18,22 +18,27 @@ import {
 
 const Header = () => {
     return (
-        <header className="  border-b border border-border/40 bg-background h-16 px-6 flex items-center justify-between">
+        <header className=" z-[999] border-b border border-border/40 bg-[#1a1a1a] text-white h-16 px-6 flex items-center justify-between">
             {/* Company Name */}
             <div className="flex items-center gap-4">
-                <h1 className="text-xl font-semibold text-primary">Quick Commerce Inc</h1>
+                <h1 className="text-xl font-semibold text-white">Quick Commerce Inc</h1>
             </div>
 
             {/* Search Bar */}
-            <div className="flex-1 max-w-xl px-4">
+            <div className="flex-1 max-w-xl border-none bg-gray-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-30 border border-gray-100 hover:border-gray-300">
                 <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                        placeholder="Search anything..." 
-                        className="pl-8 bg-accent/50 border-0 focus-visible:ring-1 w-full"
+                    <Input
+                        placeholder="Search anything..."
+                        className="pl-8 border-none hover:border focus-visible:ring-1 w-full pr-10"
                     />
+                    <div className="absolute right-2 top-1.5 flex items-center space-x-1 text-sm text-muted-foreground">
+                        <kbd className="bg-gray-200 px-1.5 py-0.5 rounded">Ctrl</kbd>
+                        <kbd className="bg-gray-200 px-1.5 py-0.5 rounded">K</kbd>
+                    </div>
                 </div>
             </div>
+
 
             {/* Right Section - Notifications & Profile */}
             <div className="flex items-center gap-4">
