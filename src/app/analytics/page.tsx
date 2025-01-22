@@ -8,6 +8,7 @@ import { Label } from '@radix-ui/react-dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DatePickerWithRange } from '../components/datepicker';
 
 // Metrics data
 const metrics = [
@@ -51,15 +52,15 @@ function Page() {
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="bg-white text-[14px] text-center rounded-md p-1 shadow whitespace-nowrap"
+                            className=" rounded-md shadow whitespace-nowrap"
                         >
-                            22 Dec 2024-21 Jan 2025
+                            <DatePickerWithRange/>
                         </motion.div>
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white text-[14px] text-center rounded-md p-1 shadow whitespace-nowrap"
+                            className="bg-white text-[14px] text-center  flex items-center rounded-md p-1 shadow whitespace-nowrap"
                         >
                             No comparison
                         </motion.div>
@@ -67,7 +68,7 @@ function Page() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-white text-[14px] text-center rounded-md p-1 shadow whitespace-nowrap"
+                            className="bg-white text-[14px] text-center flex items-center  rounded-md p-1 shadow whitespace-nowrap"
                         >
                             Group by: None
                         </motion.div>
@@ -193,6 +194,9 @@ function Page() {
                     </AnimatePresence>
                 </div>
             </div>
+
+
+            
         </div>
     )
 }
