@@ -1,9 +1,34 @@
 "use client"
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { SlidersHorizontal } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@radix-ui/react-dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
+// Metrics data
+const metrics = [
+    { id: "atc", label: "ATC" },
+    { id: "clicks", label: "Clicks" },
+    { id: "cpm", label: "CPM" },
+    { id: "ctr", label: "CTR" },
+    { id: "impressions", label: "Impressions" },
+    { id: "orders", label: "Orders" },
+    { id: "other_skus", label: "Other SKUs" },
+    { id: "revenue", label: "Revenue" },
+    { id: "roas", label: "ROAS" },
+    { id: "same_skus", label: "Same SKUs" },
+    { id: "spend", label: "Spend" },
+];
+
+const dimensions = [
+    { id: "productid", label: "Product Id" },
+    { id: "productname", label: "Product Name" },
+    { id: "category", label: "Category" },
+];
 function Page() {
     const data = {
         total: '₹4.9L',
@@ -18,7 +43,7 @@ function Page() {
     const [showFilters, setShowFilters] = useState(false);
 
     return (
-        <div className="min-h-screen w-full">
+        <div className='flex-1 overflow-auto relative z-10'>
             {/* Header Controls - Fixed at top */}
             <div className="sticky top-0 bg-gray-50 z-20 p-4 border-b">
                 <div className="flex justify-between items-center max-w-full">
@@ -107,6 +132,8 @@ function Page() {
                     {/* Filter Panel */}
                     <AnimatePresence>
                         {showFilters && (
+
+
                             <motion.div
                                 className="lg:w-64 w-full lg:sticky lg:top-20"
                                 initial={{ opacity: 0, x: 20 }}
@@ -114,27 +141,54 @@ function Page() {
                                 exit={{ opacity: 0, x: 20 }}
                                 transition={{ duration: 0.3 }}
                             >
-                                <Card className="p-4 lg:sticky lg:top-20">
-                                    <h2 className="font-bold mb-4">Metrics</h2>
-                                    <motion.div
-                                        className="space-y-2"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 }}
-                                    >
-                                        {['Orders', 'Gross sales', 'Discounts', 'Returns', 'Net sales', 'Shipping charges', 'Taxes'].map((item) => (
-                                            <motion.div
-                                                key={item}
-                                                className="p-2 hover:bg-gray-100 rounded cursor-pointer"
-                                                whileHover={{ scale: 1.02 }}
-                                                whileTap={{ scale: 0.98 }}
-                                            >
-                                                {item}
-                                            </motion.div>
-                                        ))}
-                                    </motion.div>
-                                </Card>
+
+                                <Tabs defaultValue="metrics" className="w-[250px]  lg:sticky lg:top-20">
+                                    <TabsList className="grid w-full grid-cols-2">
+                                        <TabsTrigger value="metrics">Metrics</TabsTrigger>
+                                        <TabsTrigger value="dimensions">Dimensions</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="metrics">
+                                        <Card>
+
+                                            <CardContent className="space-y-3 py-5 ">
+                                                {metrics.map((metric) => (
+                                                    <div key={metric.id} className="flex items-center space-x-2">
+                                                        <Checkbox id={metric.id} />
+                                                        <label
+                                                            htmlFor="terms"
+                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            {metric.label}
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </CardContent>
+
+                                        </Card>
+                                    </TabsContent>
+                                    <TabsContent value="dimensions">
+                                        <Card>
+                                            <CardContent className="space-y-3 py-5 ">
+                                                {dimensions.map((dimension) => (
+                                                    <div key={dimension.id} className="flex items-center space-x-2">
+                                                        <Checkbox id={dimension.id} />
+                                                        <label
+                                                            htmlFor="terms"
+                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >
+                                                            {dimension.label}
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </CardContent>
+
+                                        </Card>
+                                    </TabsContent>
+
+                                    <Button className="w-full my-3">Apply</Button>
+                                </Tabs>
                             </motion.div>
+
                         )}
                     </AnimatePresence>
                 </div>

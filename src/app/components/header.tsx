@@ -18,10 +18,10 @@ import {
 
 const Header = () => {
     return (
-        <header className="sticky top-0 z-50 border-b border border-border/40 bg-background h-16 px-6 flex items-center justify-between">
+        <header className="  border-b border border-border/40 bg-background h-16 px-6 flex items-center justify-between">
             {/* Company Name */}
             <div className="flex items-center gap-4">
-                <h1 className="text-xl font-semibold text-primary">Acme Inc</h1>
+                <h1 className="text-xl font-semibold text-primary">Quick Commerce Inc</h1>
             </div>
 
             {/* Search Bar */}
