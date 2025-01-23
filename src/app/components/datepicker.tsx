@@ -1,59 +1,92 @@
-import * as React from "react"
-import { addDays, format } from "date-fns"
-import { CalendarIcon, Check, X } from "lucide-react"
-import { DateRange } from "react-day-picker"
+import * as React from "react";
+import { addDays, format } from "date-fns";
+import { CalendarIcon, Check, X } from "lucide-react";
+import { DateRange } from "react-day-picker";
+import axios from "axios";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-
+} from "@/components/ui/accordion";
+interface DatePickerWithRangeProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  data: any; // Replace `any` with a specific type for `data`, depending on your use case
+}
 export function DatePickerWithRange({
   className,
+  data,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2022, 0, 20),
-    to: addDays(new Date(2022, 0, 20), 20),
-  })
-  const [tempDate, setTempDate] = React.useState<DateRange | undefined>(date)
-  const [open, setOpen] = React.useState(false)
-  const [calendarMonth, setCalendarMonth] = React.useState<Date>(date?.from || new Date())
+    from: new Date(2025, 0, 20),
+    to: addDays(new Date(2025, 0, 20), 20),
+  });
+  const [tempDate, setTempDate] = React.useState<DateRange | undefined>(date);
+  const [open, setOpen] = React.useState(false);
+  const [calendarMonth, setCalendarMonth] = React.useState<Date>(
+    date?.from || new Date()
+  );
 
   const updateDateRange = (newRange: DateRange | undefined) => {
-    setTempDate(newRange)
+    setTempDate(newRange);
     if (newRange?.from) {
-      setCalendarMonth(newRange.from)
+      setCalendarMonth(newRange.from);
     }
-  }
+  };
 
-  const handleApply = () => {
-    setDate(tempDate)
-    setOpen(false)
-  }
+  const handleApply = async (e) => {
+    e.preventDefault();
+    
+    // Set the temporary date to your state
+    setDate(tempDate);
+    console.log(tempDate)
+
+    // Close the date picker or modal (if applicable)
+    setOpen(false);
+
+    try {
+      // Wait for the POST request to complete
+      const result = await axios.post(
+        "http://localhost:5000/datewise", tempDate
+      );
+
+      // Log the response
+      console.log(result);
+      data(result.data.data)
+    } catch (error) {
+      // Log any errors
+      console.log("Error at post request", error);
+    }
+  };
 
   const handleCancel = () => {
-    setTempDate(date)
-    setOpen(false)
-  }
+    setTempDate(date);
+    setOpen(false);
+  };
 
-  const QuickSelectButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
+  const QuickSelectButton = ({
+    label,
+    onClick,
+  }: {
+    label: string;
+    onClick: () => void;
+  }) => (
     <button
       onClick={onClick}
       className="w-full text-left px-2 py-1 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
     >
       {label}
     </button>
-  )
+  );
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -89,41 +122,62 @@ export function DatePickerWithRange({
               <div className="p-3 overflow-y-auto max-h-[350px] scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
                 <div className="space-y-3">
                   <div>
-                    <h3 className="text-xs font-medium text-gray-900 mb-1.5">Quick select</h3>
+                    <h3 className="text-xs font-medium text-gray-900 mb-1.5">
+                      Quick select
+                    </h3>
                     <div className="space-y-0.5">
                       <QuickSelectButton
                         label="Last Week"
-                        onClick={() => updateDateRange({
-                          from: new Date(new Date().setDate(new Date().getDate() - 7)),
-                          to: new Date(),
-                        })}
+                        onClick={() =>
+                          updateDateRange({
+                            from: new Date(
+                              new Date().setDate(new Date().getDate() - 7)
+                            ),
+                            to: new Date(),
+                          })
+                        }
                       />
                       <QuickSelectButton
                         label="Last 30 Days"
-                        onClick={() => updateDateRange({
-                          from: new Date(new Date().setDate(new Date().getDate() - 30)),
-                          to: new Date(),
-                        })}
+                        onClick={() =>
+                          updateDateRange({
+                            from: new Date(
+                              new Date().setDate(new Date().getDate() - 30)
+                            ),
+                            to: new Date(),
+                          })
+                        }
                       />
                       <QuickSelectButton
                         label="Last 90 Days"
-                        onClick={() => updateDateRange({
-                          from: new Date(new Date().setDate(new Date().getDate() - 90)),
-                          to: new Date(),
-                        })}
+                        onClick={() =>
+                          updateDateRange({
+                            from: new Date(
+                              new Date().setDate(new Date().getDate() - 90)
+                            ),
+                            to: new Date(),
+                          })
+                        }
                       />
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-xs font-medium text-gray-900 mb-1.5">Date to now</h3>
+                    <h3 className="text-xs font-medium text-gray-900 mb-1.5">
+                      Date to now
+                    </h3>
                     <div className="space-y-0.5">
                       <QuickSelectButton
                         label="Week to Date"
                         onClick={() => {
-                          const startOfWeek = new Date()
-                          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
-                          updateDateRange({ from: startOfWeek, to: new Date() })
+                          const startOfWeek = new Date();
+                          startOfWeek.setDate(
+                            startOfWeek.getDate() - startOfWeek.getDay()
+                          );
+                          updateDateRange({
+                            from: startOfWeek,
+                            to: new Date(),
+                          });
                         }}
                       />
                       <QuickSelectButton
@@ -133,8 +187,11 @@ export function DatePickerWithRange({
                             new Date().getFullYear(),
                             new Date().getMonth(),
                             1
-                          )
-                          updateDateRange({ from: startOfMonth, to: new Date() })
+                          );
+                          updateDateRange({
+                            from: startOfMonth,
+                            to: new Date(),
+                          });
                         }}
                       />
                       <QuickSelectButton
@@ -144,15 +201,25 @@ export function DatePickerWithRange({
                             new Date().getFullYear(),
                             Math.floor(new Date().getMonth() / 3) * 3,
                             1
-                          )
-                          updateDateRange({ from: startOfQuarter, to: new Date() })
+                          );
+                          updateDateRange({
+                            from: startOfQuarter,
+                            to: new Date(),
+                          });
                         }}
                       />
                       <QuickSelectButton
                         label="Year to Date"
                         onClick={() => {
-                          const startOfYear = new Date(new Date().getFullYear(), 0, 1)
-                          updateDateRange({ from: startOfYear, to: new Date() })
+                          const startOfYear = new Date(
+                            new Date().getFullYear(),
+                            0,
+                            1
+                          );
+                          updateDateRange({
+                            from: startOfYear,
+                            to: new Date(),
+                          });
                         }}
                       />
                     </div>
@@ -190,10 +257,26 @@ export function DatePickerWithRange({
                       <AccordionContent className="pt-0 pb-1">
                         <div className="space-y-0.5">
                           {[
-                            { label: "Q1 2024", from: "2024-01-01", to: "2024-03-31" },
-                            { label: "Q2 2024", from: "2024-04-01", to: "2024-06-30" },
-                            { label: "Q3 2024", from: "2024-07-01", to: "2024-09-30" },
-                            { label: "Q4 2024", from: "2024-10-01", to: "2024-12-31" },
+                            {
+                              label: "Q1 2024",
+                              from: "2024-01-01",
+                              to: "2024-03-31",
+                            },
+                            {
+                              label: "Q2 2024",
+                              from: "2024-04-01",
+                              to: "2024-06-30",
+                            },
+                            {
+                              label: "Q3 2024",
+                              from: "2024-07-01",
+                              to: "2024-09-30",
+                            },
+                            {
+                              label: "Q4 2024",
+                              from: "2024-10-01",
+                              to: "2024-12-31",
+                            },
                           ].map((quarter) => (
                             <QuickSelectButton
                               key={quarter.label}
@@ -210,7 +293,6 @@ export function DatePickerWithRange({
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
-
                 </div>
               </div>
             </div>
@@ -256,5 +338,5 @@ export function DatePickerWithRange({
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }
