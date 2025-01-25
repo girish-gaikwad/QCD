@@ -1,7 +1,10 @@
 // Import the required BigQuery library
 const express = require("express");
 const cors = require("cors");
-const { BigQuery } = require("@google-cloud/bigquery");
+const fs = require("fs");
+
+// Load JSON from a file
+const jsonData = JSON.parse(fs.readFileSync("output.json", "utf-8"));
 
 const app = express();
 const port = 5000;
@@ -23,21 +26,77 @@ async function extractDate(dateString) {
   return date.toLocaleDateString("en-CA"); // 'en-CA' gives the date format YYYY-MM-DD
 }
 
+async function aggregateByCategory(data) {
+  const result = data.reduce((acc, product) => {
+    if (!acc[product.category_name]) {
+      acc[product.category_name] = {
+        category_name: product.category_name,
+        mrp : 0, // Include category name for better array output
+        total_products: 0,
+        ad_atc: 0,
+        ad_clicks: 0,
+        ad_impressions: 0,
+        ad_orders: 0,
+        ad_revenue: 0,
+        ad_spend: 0,
+        discounted_selling_price : 0,
+        gross_merchandise_value: 0,
+        gross_selling_value: 0,
+        stock_on_hand_sellable: 0,
+        stock_on_hand_masterwarehouse: 0,
+        total_units_sold:0,
+        products: [],
+      };
+    }
+
+    const category = acc[product.category_name];
+    category.total_products++;
+    category.mrp+=product.mrp;
+    category.ad_atc += product.ad_atc;
+    category.ad_clicks += product.ad_clicks;
+    category.ad_impressions += product.ad_impressions;
+    category.ad_orders += product.ad_orders;
+    category.ad_revenue += product.ad_revenue;
+    category.ad_spend += product.ad_spend;
+    category.discounted_selling_price += product.discounted_selling_price;
+    category.gross_merchandise_value += product.gross_merchandise_value;
+    category.gross_selling_value += product.gross_selling_value;
+    category.stock_on_hand_sellable += product.stock_on_hand_sellable;
+    category.stock_on_hand_masterwarehouse +=
+      product.stock_on_hand_masterwarehouse;
+    category.total_units_sold += product.total_units_sold;
+    category.products.push(product);
+
+    // Recalculate averages
+    
+
+    return acc;
+  }, {});
+
+  // Convert the object to an array
+  return Object.values(result);
+}
+
 app.post("/datewise", async (req, res) => {
-  const { from, to } = req.body;
-  console.log(from,to)
+  const { from, to, cond } = req.body;
+  console.log(req.body)
+  console.log(from, to, cond);
   try {
     // Wait for the date extraction to complete
     fromDate = await extractDate(from);
     toDate = await extractDate(to);
-    console.log(fromDate,toDate) // Corrected variable name
-
-    console.log(fromDate, toDate);
-    await initializeDataNormal();
-    console.log(data);
+    if (cond === true) {
+      const result = await aggregateByCategory(jsonData);
+      res.json({
+        data: result,
+        message: "successfully pullled categorywise data",
+      });
+    } else {
+      res.status(200).json({ data: jsonData, message: "successful" });
+    }
+    // await initializeDataNormal();
 
     // Send JSON response back with status 200
-    res.send({ data });
   } catch (error) {
     console.log("Error extracting dates", error);
     res.status(500).json({ error: "Failed to extract dates" });
@@ -45,116 +104,12 @@ app.post("/datewise", async (req, res) => {
 });
 
 // Create a BigQuery client
-const bigquery = new BigQuery({
-  keyFilename:
-    "C:/Users/adhav/OneDrive/Desktop/quickCommerce/hopeful-history-405018-bee125474176.json", // Path to your service account key file
-  projectId: "hopeful-history-405018", // Your Google Cloud Project ID
-});
-const categoryWise = false;
 
-async function connectAndQueryBigQuery() {
-  const datasetId = "Quickcommerce"; // Replace with your dataset ID
-  const tableId = "product_performance_data"; // Replace with your table ID
 
-  // const query = `
-  //   SELECT *
-  //   FROM \`${bigquery.projectId}.${datasetId}.${tableId}\`
-  //   WHERE processed_date = '2025-01-18'
-  // `;
-  const query = `
-  SELECT *
-  FROM \`${bigquery.projectId}.${datasetId}.${tableId}\`
-  WHERE processed_date BETWEEN '${fromDate}' AND '${toDate}'
-`;
 
-  try {
-    // Run the query
-    const [rows] = await bigquery.query({ query });
-    data = rows;
-
-    console.log("succesfully fetched");
-  } catch (error) {
-    console.error("Error running query:", error);
-  }
-}
-
-function aggregateByCategory(data) {
-  return data.reduce((acc, product) => {
-    if (!acc[product.category]) {
-      acc[product.category] = {
-        total_products: 0,
-        total_atc: 0,
-        total_clicks: 0,
-        total_impressions: 0,
-        total_orders: 0,
-        total_revenue: 0,
-        total_spend: 0,
-        average_cpm: 0,
-        average_ctr: 0,
-        average_roas: 0,
-        campaign_ids: new Set(),
-        products: [],
-      };
-    }
-
-    const category = acc[product.category];
-    category.total_products++;
-    category.total_atc += product.atc;
-    category.total_clicks += product.clicks;
-    category.total_impressions += product.impressions;
-    category.total_orders += product.orders;
-    category.total_revenue += product.revenue;
-    category.total_spend += product.spend;
-    category.campaign_ids.add(product.campaign_id);
-    category.products.push(product);
-
-    // Recalculate averages
-    category.average_cpm =
-      category.products.reduce((sum, p) => sum + p.cpm, 0) /
-      category.products.length;
-    category.average_ctr =
-      category.products.reduce((sum, p) => sum + p.ctr, 0) /
-      category.products.length;
-    category.average_roas =
-      category.products.reduce((sum, p) => sum + p.roas, 0) /
-      category.products.length;
-
-    return acc;
-  }, {});
-}
-
+// const result =  aggregateByCategory(jsonData)
+// console.log(result)
 // Execute the function
-async function initializeDataCategoryWise() {
-  try {
-    await connectAndQueryBigQuery();
-    // Now bigQueryData contains your query results
-
-    console.log("Data is ready:", data.length, "rows");
-    const aggregatedData = aggregateByCategory(data);
-    console.log(aggregatedData);
-  } catch (error) {
-    console.error("Failed to initialize data:", error);
-  }
-}
-async function initializeDataNormal() {
-  try {
-    await connectAndQueryBigQuery();
-    // Now bigQueryData contains your query results
-
-    console.log("Data is ready:", data.length, "rows");
-    console.log(data);
-  } catch (error) {
-    console.error("Failed to initialize data:", error);
-  }
-}
-
-if (categoryWise) {
-  console.log("CategoryWise request");
-  // initializeDataCategoryWise();
-} else {
-  console.log("Normal Data");
-  // initializeDataNormal();
-}
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

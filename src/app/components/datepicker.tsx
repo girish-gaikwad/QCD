@@ -20,12 +20,14 @@ import {
 } from "@/components/ui/accordion";
 interface DatePickerWithRangeProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  data: any; // Replace `any` with a specific type for `data`, depending on your use case
+  data: any;
+  cond: any; // Replace `any` with a specific type for `data`, depending on your use case
 }
 export function DatePickerWithRange({
   className,
   data,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  cond,
+}: DatePickerWithRangeProps) {
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(2025, 0, 20),
     to: addDays(new Date(2025, 0, 20), 20),
@@ -45,23 +47,27 @@ export function DatePickerWithRange({
 
   const handleApply = async (e) => {
     e.preventDefault();
-    
+
     // Set the temporary date to your state
     setDate(tempDate);
-    console.log(tempDate)
-
+    console.log(tempDate);
+    
     // Close the date picker or modal (if applicable)
     setOpen(false);
 
+    console.log("hii",cond)
+
     try {
       // Wait for the POST request to complete
+      const payLoad = {...tempDate,cond}
       const result = await axios.post(
-        "http://localhost:5000/datewise", tempDate
+        "http://localhost:5000/datewise",
+        payLoad
       );
 
       // Log the response
       console.log(result);
-      data(result.data.data)
+      data(result.data.data);
     } catch (error) {
       // Log any errors
       console.log("Error at post request", error);

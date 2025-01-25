@@ -28,40 +28,49 @@ import axios from "axios";
 
 // Metrics data
 const metrics = [
-  { id: "atc", label: "ATC" },
-  { id: "clicks", label: "Clicks" },
-  { id: "cpm", label: "CPM" },
-  { id: "ctr", label: "CTR" },
-  { id: "impressions", label: "Impressions" },
-  { id: "orders", label: "Orders" },
-  { id: "other_skus", label: "Other SKUs" },
-  { id: "revenue", label: "Revenue" },
-  { id: "roas", label: "ROAS" },
-  { id: "same_skus", label: "Same SKUs" },
-  { id: "spend", label: "Spend" },
+  { id: "ad_atc", label: "ATC" },
+  { id: "ad_clicks", label: "Clicks" },
+  { id: "ad_orders", label: "Orders" },
+  { id: "gross_selling_value", label: "gross_selling_value" },
+  { id: "total_units_sold", label: "total_units_sold" },
+  { id: "ad_impressions", label: "ad_impressions" },
+  { id: "ad_spend", label: "ad_spend" },
+  {
+    id: "stock_on_hand_masterwarehouse",
+    label: "stock_on_hand_masterwarehouse",
+  },
+  { id: "stock_on_hand_sellable", label: "stock_on_hand_sellable" },
+  { id: "gross_merchandise_value", label: "gross_merchandise_value" },
+  { id: "mrp", label: "mrp" },
+  { id: "discounted_selling_price", label: "discounted_selling_price" },
+  { id: "ad_revenue", label: "ad_revenue" },
 ];
 
 const dimensions = [
-  { id: "productid", label: "Product Id" },
-  { id: "productname", label: "Product Name" },
-  { id: "category", label: "Category" },
+  { id: "product_id", label: "Product Id" },
+  { id: "product_name", label: "Product Name" },
+  { id: "category_name", label: "Category" },
 ];
 function Page() {
   type VisibleColumns = {
-    atc: boolean;
-    orders: boolean;
-    revenue: boolean;
-    clicks: boolean;
-    impressions: boolean;
-    other_skus: boolean;
-    cpm: boolean;
-    same_skus: boolean;
-    spend: boolean;
-    ctr: boolean;
-    productid: boolean;
-    productname: boolean;
-    category: boolean;
+    ad_atc: boolean;
+    ad_clicks: boolean;
+    ad_orders: boolean;
+    gross_selling_value: boolean;
+    total_units_sold: boolean;
+    ad_impressions: boolean;
+    ad_spend: boolean;
+    stock_on_hand_masterwarehouse: boolean;
+    stock_on_hand_sellable: boolean;
+    gross_merchandise_value: boolean;
+    mrp: boolean;
+    discounted_selling_price: boolean;
+    ad_revenue: boolean;
+    product_id: boolean;
+    product_name: boolean;
+    category_name: boolean;
   };
+
   type MetricsState = {
     [key: string]: boolean;
   };
@@ -69,109 +78,124 @@ function Page() {
     [key: string]: boolean;
   };
   interface Product {
-    productid: string;
-    productname: string;
-    brandid: string;
-    brandname: string;
-    atc: number;
-    campaign_id: number;
-    campaign_name: string;
-    category: string;
-    clicks: number;
-    cpm: number;
-    ctr: number;
-    impressions: number;
-    orders: number;
-    other_skus: number;
-    revenue: number;
-    roas: number;
-    same_skus: number;
-    spend: number;
-    processed_date: string;
+    date: number;
+    product_id: string;
+    product_name: string;
+    product_ean: number;
+    manufacturer_name: string;
+    brand_name: string;
+    category_name: string;
+    mrp: number;
+    discounted_selling_price: number;
+    stock_on_hand_sellable: number;
+    stock_on_hand_masterwarehouse: number;
+    total_units_sold: number;
+    gross_merchandise_value: number;
+    gross_selling_value: number;
+    ad_spend: number;
+    ad_impressions: number;
+    ad_clicks: number;
+    ad_atc: number;
+    ad_orders: number;
+    ad_revenue: number;
   }
+
   interface TableHeader {
     key: string;
     label: string;
   }
   const [visibleColumns, setVisibleColumns] = useState<VisibleColumns>({
-    atc: false,
-    orders: false,
-    revenue: false,
-    clicks: false,
-    impressions: true,
-    other_skus: false,
-    cpm: false,
-    same_skus: false,
-    spend: true,
-    ctr: false,
-    productid: false,
-    productname: true,
-    category: false,
+    ad_atc: false,
+    ad_clicks: false,
+    ad_orders: false,
+    gross_selling_value: false,
+    total_units_sold: false,
+    ad_impressions: false,
+    ad_spend: false,
+    stock_on_hand_masterwarehouse: false,
+    stock_on_hand_sellable: false,
+    gross_merchandise_value: false,
+    mrp: true,
+    discounted_selling_price: false,
+    ad_revenue: false,
+    product_id: false,
+    product_name: true,
+    category_name: false,
   });
 
   const [selectedMetrics, setSelectedMetrics] = useState<MetricsState>({
-    atc: false,
-    orders: false,
-    revenue: false,
-    clicks: false,
-    impressions: false,
-    other_skus: false,
-    cpm: false,
-    same_skus: false,
-    spend: false,
-    ctr: false,
+    ad_atc: false,
+    ad_clicks: false,
+    ad_orders: false,
+    gross_selling_value: false,
+    total_units_sold: false,
+    ad_impressions: false,
+    ad_spend: false,
+    stock_on_hand_masterwarehouse: false,
+    stock_on_hand_sellable: false,
+    gross_merchandise_value: false,
+    mrp: false,
+    discounted_selling_price: false,
+    ad_revenue: false,
   });
 
   const [selectedDimensions, setSelectedDimensions] = useState<DimensionState>({
-    productid: false,
-    productname: false,
-    category: false,
+    product_id: false,
+    product_name: false,
+    category_name: false,
   });
 
   // let data: Product[] = [];
   const [data, setData] = useState<Product[]>([
     {
-      productid: "f2cd647c-239f-4258-b8cc-943131a355b1",
-      productname:
-        "Lifelong 2-in1 Egg Boiler and Poacher 500-Watt (Black), Boil 8 eggs, Poach 4 eggs, 3 Boiling Modes",
-      brandid: "72637924-4a0c-4391-9e63-4cda2d401e01",
-      brandname: "Lifelong",
-      atc: 1,
-      campaign_id: 2023706,
-      campaign_name: "Lifelong-Electronics PCA Jan",
-      category: "Kitchen Appliances",
-      clicks: 18,
-      cpm: 700,
-      ctr: 0.79,
-      impressions: 2287,
-      orders: 6,
-      other_skus: 6,
-      revenue: 16588,
-      roas: 10.36,
-      same_skus: 0,
-      spend: 1601,
-      processed_date: "2025-01-18",
-    }
+      date: 45659,
+      product_id: "00e50353-b987-45d3-8251-2492ab9b8d32",
+      product_name:
+        "Lifelong Llpcm300 Rechargeable Nose And Ear Trimmer; 40 Minutes Runtime And Washable; For Men, Woman 1.0 PIECE",
+      product_ean: 8904385419063,
+      manufacturer_name: "Lifelong Online Retail Pvt Ltd",
+      brand_name: "Lifelong",
+      category_name: "Electronics & Appliances",
+      mrp: 1500,
+      discounted_selling_price: 1050,
+      stock_on_hand_sellable: 1162,
+      stock_on_hand_masterwarehouse: 243,
+      total_units_sold: 16,
+      gross_merchandise_value: 19495,
+      gross_selling_value: 13646.5,
+      ad_spend: 0,
+      ad_impressions: 0,
+      ad_clicks: 0,
+      ad_atc: 0,
+      ad_orders: 0,
+      ad_revenue: 0,
+    },
   ]);
   // const data: Product[] = [];
 
   const tableHeaders: TableHeader[] = [
-    { key: "productid", label: "Product Id" },
-    { key: "productname", label: "Product Name" },
-    { key: "category", label: "Category" },
-    { key: "atc", label: "ATC" },
-    { key: "clicks", label: "Clicks" },
-    { key: "cpm", label: "CPM" },
-    { key: "ctr", label: "CTR" },
-    { key: "impressions", label: "Impressions" },
-    { key: "orders", label: "Orders" },
-    { key: "other_skus", label: "Other SKUs" },
-    { key: "revenue", label: "Revenue" },
-    { key: "roas", label: "ROAS" },
-    { key: "same_skus", label: "Same SKUs" },
-    { key: "spend", label: "Spend" },
+    { key: "product_id", label: "Product id" },
+    { key: "product_name", label: "Product Name" },
+    { key: "category_name", label: "Category" },
+    { key: "ad_atc", label: "ATC" },
+    { key: "ad_clicks", label: "Clicks" },
+    { key: "ad_orders", label: "Orders" },
+    { key: "gross_selling_value", label: "gross_selling_value" },
+    { key: "total_units_sold", label: "total_units_sold" },
+    { key: "ad_impressions", label: "ad_impressions" },
+    { key: "ad_spend", label: "ad_spend" },
+    {
+      key: "stock_on_hand_masterwarehouse",
+      label: "stock_on_hand_masterwarehouse",
+    },
+    { key: "stock_on_hand_sellable", label: "stock_on_hand_sellable" },
+    { key: "gross_merchandise_value", label: "gross_merchandise_value" },
+    { key: "mrp", label: "mrp" },
+    { key: "discounted_selling_price", label: "discounted_selling_price" },
+    { key: "ad_revenue", label: "ad_revenue" },
   ];
   const [showFilters, setShowFilters] = useState(false);
+
 
   const toggleMetric = (metricID: string) => {
     setSelectedMetrics((prev: MetricsState) => ({
@@ -186,8 +210,17 @@ function Page() {
       [dimensionID]: !prev[dimensionID],
     }));
   };
+
+  const evaluateGroupdata =  () => {
+    const { product_id, product_name, category_name } = selectedDimensions;
+    if (category_name && !product_id && !product_name) {
+      return true
+    } else {
+      return false
+    }
+  };
   const columnsSelected: string[] = [];
-  const applySelection = () => {
+  const applySelection = async () => {
     const updatedVisibleColumns = { ...visibleColumns };
 
     Object.entries(selectedMetrics).forEach(([key, value]) => {
@@ -212,8 +245,25 @@ function Page() {
       }
     });
 
-    console.log(columnsSelected);
-    console.log(visibleColumns);
+    // console.log(columnsSelected);
+    // console.log(visibleColumns);
+    const groupData =evaluateGroupdata()
+    console.log(groupData);
+    try {
+      // Wait for the POST request to complete
+      const result = await axios.post("http://localhost:5000/datewise", {
+        from: "2025-01-17T18:30:00.000Z",
+        to: "2025-02-11T18:30:00.000Z",
+        cond: groupData,
+      });
+
+      // Log the response
+      console.log(result.data.data);
+      setData(result.data.data)
+    } catch (error) {
+      // Log any errors
+      console.log("Error at post request", error);
+    }
   };
 
   const formatValue = (value, key) => {
@@ -224,6 +274,7 @@ function Page() {
       return value.toLocaleString();
     }
     return value;
+    console.log(value);
   };
   // const calculateSummary = () => {
   //   return tableHeaders.reduce((acc, header) => {
@@ -247,7 +298,6 @@ function Page() {
     console.log(event);
     setData(event);
   };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -257,11 +307,14 @@ function Page() {
           {
             from: "2025-01-17T18:30:00.000Z",
             to: "2025-02-11T18:30:00.000Z",
+            cond: false,
           } // JSON object
         );
-        setData(result.data.data)
+
         // Log the response
+        setData(result.data.data);
         console.log("Response from backend:", result.data.data);
+        console.log;
       } catch (error) {
         // Log any errors
         console.error("Error at POST request:", error);
@@ -282,7 +335,7 @@ function Page() {
               animate={{ opacity: 1 }}
               className=" rounded-md shadow whitespace-nowrap"
             >
-              <DatePickerWithRange data={handleData} />
+              <DatePickerWithRange data={handleData} cond = {true} />
             </motion.div>
             <motion.div
               initial={{ opacity: 0 }}
@@ -367,26 +420,55 @@ function Page() {
                         )}
                       </TableBody> */}
                       <TableBody>
-                        {data.map((row, rowIndex) => (
-                          <TableRow
-                            key={rowIndex}
-                            className={
-                              rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
-                            }
-                          >
-                            {tableHeaders.map(
-                              (header) =>
-                                visibleColumns[header.key] && (
-                                  <TableCell
-                                    key={`${rowIndex}-${header.key}`}
-                                    className="px-4 py-3 text-sm text-gray-500"
-                                  >
-                                    {formatValue(row[header.key], header.key)}
-                                  </TableCell>
-                                )
-                            )}
-                          </TableRow>
-                        ))}
+                        {
+                          data.map((row, rowIndex) => (
+                            <TableRow
+                              key={rowIndex}
+                              className={
+                                rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
+                              }
+                            >
+                              {tableHeaders.map(
+                                (header) =>
+                                  visibleColumns[header.key] && (
+                                    <TableCell
+                                      key={`${rowIndex}-${header.key}`}
+                                      className="px-4 py-3 text-sm text-gray-500"
+                                    >
+                                      {formatValue(row[header.key], header.key)}
+                                    </TableCell>
+                                  )
+                              )}
+                            </TableRow>
+                          ))
+                          // : Object.entries(data).map(
+                          //     ([key, value], rowIndex) => (
+                          //       <TableRow
+                          //         key={rowIndex}
+                          //         className={
+                          //           rowIndex % 2 === 0
+                          //             ? "bg-white"
+                          //             : "bg-gray-50"
+                          //         }
+                          //       >
+                          //         {tableHeaders.map(
+                          //           (header) =>
+                          //             visibleColumns[header.key] && (
+                          //               <TableCell
+                          //                 key={`${rowIndex}-${header.key}`}
+                          //                 className="px-4 py-3 text-sm text-gray-500"
+                          //               >
+                          //                 {formatValue(
+                          //                   value[header.key],
+                          //                   header.key
+                          //                 )}
+                          //               </TableCell>
+                          //             )
+                          //         )}
+                          //       </TableRow>
+                          //     )
+                          //   )
+                        }
                       </TableBody>
                     </Table>
                   </div>
