@@ -23,7 +23,25 @@ const worksheet = workbook.Sheets[sheetName];
 // Convert the sheet data to JSON
 const jsonData = xlsx.utils.sheet_to_json(worksheet);
 
+function calculateMetrics(data) {
+   
+    return data.map(item => {
+      // Convert Excel serial number to date
+      if (item.date) {
+        const baseDate = new Date(1899, 11, 30); // Excel starts at 30-Dec-1899
+        item.readable_date = new Date(baseDate.getTime() + item.date * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // Format: YYYY-MM-DD
+      } else {
+        item.readable_date = null; // Handle missing dates
+      }
+  
+      return item;
+    });
+  }
+  
+  const result = calculateMetrics(jsonData);
+  console.log(result);
+
 // Save JSON to a file (optional)
 fs.writeFileSync("output.json", JSON.stringify(jsonData, null, 2), "utf-8");
 
-console.log("Excel data converted to JSON:", jsonData);
+console.log("Excel data converted to JSON:");

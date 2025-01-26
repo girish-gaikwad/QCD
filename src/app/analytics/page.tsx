@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import {
   Card,
   CardContent,
@@ -25,6 +26,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import axios from "axios";
+const ColumnResize = dynamic(() => import("react-table-column-resizer"), {
+  ssr: false,
+});
 
 // Metrics data
 const metrics = [
@@ -196,7 +200,6 @@ function Page() {
   ];
   const [showFilters, setShowFilters] = useState(false);
 
-
   const toggleMetric = (metricID: string) => {
     setSelectedMetrics((prev: MetricsState) => ({
       ...prev,
@@ -211,12 +214,12 @@ function Page() {
     }));
   };
 
-  const evaluateGroupdata =  () => {
+  const evaluateGroupdata = () => {
     const { product_id, product_name, category_name } = selectedDimensions;
     if (category_name && !product_id && !product_name) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
   };
   const columnsSelected: string[] = [];
@@ -247,7 +250,7 @@ function Page() {
 
     // console.log(columnsSelected);
     // console.log(visibleColumns);
-    const groupData =evaluateGroupdata()
+    const groupData = evaluateGroupdata();
     console.log(groupData);
     try {
       // Wait for the POST request to complete
@@ -259,7 +262,7 @@ function Page() {
 
       // Log the response
       console.log(result.data.data);
-      setData(result.data.data)
+      setData(result.data.data);
     } catch (error) {
       // Log any errors
       console.log("Error at post request", error);
@@ -335,7 +338,7 @@ function Page() {
               animate={{ opacity: 1 }}
               className=" rounded-md shadow whitespace-nowrap"
             >
-              <DatePickerWithRange data={handleData} cond = {true} />
+              <DatePickerWithRange data={handleData} cond={true} />
             </motion.div>
             <motion.div
               initial={{ opacity: 0 }}
@@ -394,83 +397,86 @@ function Page() {
                               visibleColumns[header.key] && (
                                 <TableHead
                                   key={header.key}
-                                  className="px-4 py-3 sticky top-0 text-left text-sm font-semibold text-gray-900"
+                                  className="px-4 py-3 sticky top-0 text-left text-sm font-semibold text-gray-900 relative"
+                                  style={{ width: header.width || "auto" }}
                                 >
-                                  {header.label}
+                                  <div className="flex items-center">
+                                    {header.label}
+                                    <div
+                                      className="column-resizer absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-gray-300 opacity-0 hover:opacity-100"
+                                      onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        const headerCell =
+                                          e.currentTarget.closest("th");
+                                        if (!headerCell) return;
+
+                                        const startX = e.clientX;
+                                        const startWidth =
+                                          headerCell.offsetWidth;
+
+                                        const onMouseMove = (moveEvent) => {
+                                          if (!headerCell) return;
+                                          const newWidth =
+                                            startWidth +
+                                            (moveEvent.clientX - startX);
+                                          headerCell.style.width = `${Math.max(
+                                            50,
+                                            newWidth
+                                          )}px`;
+                                        };
+
+                                        const onMouseUp = () => {
+                                          document.removeEventListener(
+                                            "mousemove",
+                                            onMouseMove
+                                          );
+                                          document.removeEventListener(
+                                            "mouseup",
+                                            onMouseUp
+                                          );
+                                        };
+
+                                        document.addEventListener(
+                                          "mousemove",
+                                          onMouseMove
+                                        );
+                                        document.addEventListener(
+                                          "mouseup",
+                                          onMouseUp
+                                        );
+                                      }}
+                                    />
+                                  </div>
                                 </TableHead>
                               )
                           )}
                         </TableRow>
                       </TableHeader>
-                      {/* <TableBody>
-                        {Object.keys(summary).length > 0 && (
-                          <TableRow className="bg-gray-50">
+                      <TableBody>
+                        {data.map((row, rowIndex) => (
+                          <TableRow
+                            key={rowIndex}
+                            className={
+                              rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
+                            }
+                          >
                             {tableHeaders.map(
-                              (header, rowIndex) =>
+                              (header) =>
                                 visibleColumns[header.key] && (
                                   <TableCell
                                     key={`${rowIndex}-${header.key}`}
                                     className="px-4 py-3 text-sm text-gray-500"
+                                    style={{ width: header.width || "auto" }}
                                   >
-                                    {summary[header.key]}
+                                    {formatValue(row[header.key], header.key)}
                                   </TableCell>
                                 )
                             )}
                           </TableRow>
-                        )}
-                      </TableBody> */}
-                      <TableBody>
-                        {
-                          data.map((row, rowIndex) => (
-                            <TableRow
-                              key={rowIndex}
-                              className={
-                                rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
-                              }
-                            >
-                              {tableHeaders.map(
-                                (header) =>
-                                  visibleColumns[header.key] && (
-                                    <TableCell
-                                      key={`${rowIndex}-${header.key}`}
-                                      className="px-4 py-3 text-sm text-gray-500"
-                                    >
-                                      {formatValue(row[header.key], header.key)}
-                                    </TableCell>
-                                  )
-                              )}
-                            </TableRow>
-                          ))
-                          // : Object.entries(data).map(
-                          //     ([key, value], rowIndex) => (
-                          //       <TableRow
-                          //         key={rowIndex}
-                          //         className={
-                          //           rowIndex % 2 === 0
-                          //             ? "bg-white"
-                          //             : "bg-gray-50"
-                          //         }
-                          //       >
-                          //         {tableHeaders.map(
-                          //           (header) =>
-                          //             visibleColumns[header.key] && (
-                          //               <TableCell
-                          //                 key={`${rowIndex}-${header.key}`}
-                          //                 className="px-4 py-3 text-sm text-gray-500"
-                          //               >
-                          //                 {formatValue(
-                          //                   value[header.key],
-                          //                   header.key
-                          //                 )}
-                          //               </TableCell>
-                          //             )
-                          //         )}
-                          //       </TableRow>
-                          //     )
-                          //   )
-                        }
+                        ))}
                       </TableBody>
                     </Table>
+                    Last edited just now
                   </div>
                 </motion.div>
               </Card>
