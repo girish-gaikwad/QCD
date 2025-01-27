@@ -14,23 +14,28 @@ import ButtonDefault from "../Buttons/ButtonDefault";
 
 // Metrics data
 const metrics = [
-    { id: "atc", label: "ATC" },
-    { id: "clicks", label: "Clicks" },
-    { id: "cpm", label: "CPM" },
-    { id: "ctr", label: "CTR" },
-    { id: "impressions", label: "Impressions" },
-    { id: "orders", label: "Orders" },
-    { id: "other_skus", label: "Other SKUs" },
-    { id: "revenue", label: "Revenue" },
-    { id: "roas", label: "ROAS" },
-    { id: "same_skus", label: "Same SKUs" },
-    { id: "spend", label: "Spend" },
+    { id: "ad_atc", label: "ATC" },
+    { id: "ad_clicks", label: "Clicks" },
+    { id: "ad_orders", label: "Orders" },
+    { id: "gross_selling_value", label: "gross_selling_value" },
+    { id: "total_units_sold", label: "total_units_sold" },
+    { id: "ad_impressions", label: "ad_impressions" },
+    { id: "ad_spend", label: "ad_spend" },
+    {
+        id: "stock_on_hand_masterwarehouse",
+        label: "stock_on_hand_masterwarehouse",
+    },
+    { id: "stock_on_hand_sellable", label: "stock_on_hand_sellable" },
+    { id: "gross_merchandise_value", label: "gross_merchandise_value" },
+    { id: "mrp", label: "mrp" },
+    { id: "discounted_selling_price", label: "discounted_selling_price" },
+    { id: "ad_revenue", label: "ad_revenue" },
 ];
 
 const dimensions = [
-    { id: "productid", label: "Product Id" },
-    { id: "productname", label: "Product Name" },
-    { id: "category", label: "Category" },
+    { id: "product_id", label: "Product Id" },
+    { id: "product_name", label: "Product Name" },
+    { id: "category_name", label: "Category" },
 ];
 function Analytics() {
     type VisibleColumns = {
@@ -80,40 +85,45 @@ function Analytics() {
         label: string;
     }
     const [visibleColumns, setVisibleColumns] = useState<VisibleColumns>({
-        atc: false,
-        orders: false,
-        revenue: false,
-        clicks: false,
-        impressions: true,
-        other_skus: false,
-        cpm: false,
-        same_skus: false,
-        spend: true,
-        ctr: false,
-        productid: false,
-        productname: true,
-        category: false,
+        ad_atc: false,
+        ad_clicks: false,
+        ad_orders: false,
+        gross_selling_value: false,
+        total_units_sold: false,
+        ad_impressions: false,
+        ad_spend: false,
+        stock_on_hand_masterwarehouse: false,
+        stock_on_hand_sellable: false,
+        gross_merchandise_value: false,
+        mrp: true,
+        discounted_selling_price: false,
+        ad_revenue: false,
+        product_id: false,
+        product_name: true,
+        category_name: false,
     });
 
     const [selectedMetrics, setSelectedMetrics] = useState<MetricsState>({
-        atc: false,
-        orders: false,
-        revenue: false,
-        clicks: false,
-        impressions: false,
-        other_skus: false,
-        cpm: false,
-        same_skus: false,
-        spend: false,
-        ctr: false,
+        ad_atc: false,
+        ad_clicks: false,
+        ad_orders: false,
+        gross_selling_value: false,
+        total_units_sold: false,
+        ad_impressions: false,
+        ad_spend: false,
+        stock_on_hand_masterwarehouse: false,
+        stock_on_hand_sellable: false,
+        gross_merchandise_value: false,
+        mrp: false,
+        discounted_selling_price: false,
+        ad_revenue: false,
     });
 
     const [selectedDimensions, setSelectedDimensions] = useState<DimensionState>({
-        productid: false,
-        productname: false,
-        category: false,
+        product_id: false,
+        product_name: false,
+        category_name: false,
     });
-
     // let data: Product[] = [];
     const [data, setData] = useState<Product[]>([
         {
@@ -142,21 +152,27 @@ function Analytics() {
     // const data: Product[] = [];
 
     const tableHeaders: TableHeader[] = [
-        { key: "productid", label: "Product Id" },
-        { key: "productname", label: "Product Name" },
-        { key: "category", label: "Category" },
-        { key: "atc", label: "ATC" },
-        { key: "clicks", label: "Clicks" },
-        { key: "cpm", label: "CPM" },
-        { key: "ctr", label: "CTR" },
-        { key: "impressions", label: "Impressions" },
-        { key: "orders", label: "Orders" },
-        { key: "other_skus", label: "Other SKUs" },
-        { key: "revenue", label: "Revenue" },
-        { key: "roas", label: "ROAS" },
-        { key: "same_skus", label: "Same SKUs" },
-        { key: "spend", label: "Spend" },
+        { key: "product_id", label: "Product id" },
+        { key: "product_name", label: "Product Name" },
+        { key: "category_name", label: "Category" },
+        { key: "ad_atc", label: "ATC" },
+        { key: "ad_clicks", label: "Clicks" },
+        { key: "ad_orders", label: "Orders" },
+        { key: "gross_selling_value", label: "gross_selling_value" },
+        { key: "total_units_sold", label: "total_units_sold" },
+        { key: "ad_impressions", label: "ad_impressions" },
+        { key: "ad_spend", label: "ad_spend" },
+        {
+            key: "stock_on_hand_masterwarehouse",
+            label: "stock_on_hand_masterwarehouse",
+        },
+        { key: "stock_on_hand_sellable", label: "stock_on_hand_sellable" },
+        { key: "gross_merchandise_value", label: "gross_merchandise_value" },
+        { key: "mrp", label: "mrp" },
+        { key: "discounted_selling_price", label: "discounted_selling_price" },
+        { key: "ad_revenue", label: "ad_revenue" },
     ];
+
     const [showFilters, setShowFilters] = useState(false);
 
     const toggleMetric = (metricID: string) => {
@@ -173,7 +189,16 @@ function Analytics() {
         }));
     };
     const columnsSelected: string[] = [];
-    const applySelection = () => {
+
+    const evaluateGroupdata = () => {
+        const { product_id, product_name, category_name } = selectedDimensions;
+        if (category_name && !product_id && !product_name) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+    const applySelection = async () => {
         const updatedVisibleColumns = { ...visibleColumns };
 
         Object.entries(selectedMetrics).forEach(([key, value]) => {
@@ -198,8 +223,25 @@ function Analytics() {
             }
         });
 
-        console.log(columnsSelected);
-        console.log(visibleColumns);
+        // console.log(columnsSelected);
+        // console.log(visibleColumns);
+        const groupData = evaluateGroupdata();
+        console.log(groupData);
+        try {
+            // Wait for the POST request to complete
+            const result = await axios.post("http://localhost:5000/datewise", {
+                from: "2025-01-17T18:30:00.000Z",
+                to: "2025-02-11T18:30:00.000Z",
+                cond: groupData,
+            });
+
+            // Log the response
+            console.log(result.data.data);
+            setData(result.data.data);
+        } catch (error) {
+            // Log any errors
+            console.log("Error at post request", error);
+        }
     };
 
     const formatValue = (value, key) => {
@@ -243,11 +285,14 @@ function Analytics() {
                     {
                         from: "2025-01-17T18:30:00.000Z",
                         to: "2025-02-11T18:30:00.000Z",
+                        cond: false,
                     } // JSON object
                 );
-                setData(result.data.data)
+
                 // Log the response
+                setData(result.data.data);
                 console.log("Response from backend:", result.data.data);
+                console.log;
             } catch (error) {
                 // Log any errors
                 console.error("Error at POST request:", error);
@@ -256,6 +301,8 @@ function Analytics() {
 
         fetchData(); // Call the async function
     }, []);
+
+    console.log(data,"data");
 
     const { chartTypes, chartType, setChartType } = useSampleStore()
     return (
@@ -313,11 +360,11 @@ function Analytics() {
                             <div className="p-4 h-96 overflow-hidden rounded-[10px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
 
                                 <h2 className="font-bold mb-4">Total Spend</h2>
-                                <SpendChart data={data} />
+                                {/* <SpendChart data={data} /> */}
                             </div>
 
-                           <Table/>
-                            
+                            <Table tableHeaders={tableHeaders} visibleColumns={visibleColumns} data={data} />
+
                         </div>
                     </div>
 
