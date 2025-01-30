@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { SlidersHorizontal } from "lucide-react";
-import { DatePickerWithRange } from "@/components/datepicker";
+import { DatePickerWithRangeSubCategory } from "@/components/datepickerSub";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import Table from "@/components/Table/table";
@@ -30,7 +30,6 @@ const metrics = [
   { id: "ad_orders_othersku", label: "ad_orders_othersku" },
   { id: "ad_orders_samesku", label: "ad_orders_samesku" },
   { id: "ad_revenue", label: "ad_revenue" },
-  { id: "stock_on_hand_sellable", label: "Ad CVR% (Conversion Rate)" },
 ];
 
 const dimensions = [
@@ -38,10 +37,9 @@ const dimensions = [
   { id: "product_name", label: "Product Name" },
   { id: "category_name", label: "Category" },
 ];
-
-const category_names = ["Electronics & Appliances", "Kitchen & Dining"];
+;
 // "Home Needs","Toys & Sports","Kitchen & Dining","Pharma & Wellness","Apparel & Lifestyle"
-function Analytics() {
+function AnalyticsSub() {
   type VisibleColumns = {
     atc: boolean;
     orders: boolean;
@@ -89,12 +87,11 @@ function Analytics() {
     label: string;
   }
   const [visibleColumns, setVisibleColumns] = useState<VisibleColumns>({
-    product_name:true,
-    product_id:true,
-    category_name:true,
-    subcategory_name:true,
-    maximum_retail_price: true,
+    category_name: true,
     discounted_selling_price: true,
+    subcategory_name: true,
+    subcategory_id: true,
+    maximum_retail_price: true,
     stock_at_darkstores: true,
     stock_at_warehouses: true,
     total_orders: true,
@@ -109,7 +106,7 @@ function Analytics() {
     ad_orders: true,
     ad_orders_othersku: true,
     ad_orders_samesku: true,
-    stock_on_hand_sellable: true, // Removed label mismatch
+    // Removed label mismatch
   });
 
   const [selectedMetrics, setSelectedMetrics] = useState<MetricsState>({
@@ -129,14 +126,12 @@ function Analytics() {
     ad_orders: false,
     ad_orders_othersku: false,
     ad_orders_samesku: false,
-    stock_on_hand_sellable: false,
   });
 
   const [selectedDimensions, setSelectedDimensions] = useState<DimensionState>({
-    product_id: true,
-    product_name: true,
     category_name: true,
-    subcategory_name:true
+    subcategory_name: true,
+    subcategory_id: true,
   });
 
   // let data: Product[] = [];
@@ -191,12 +186,12 @@ function Analytics() {
   // const data: Product[] = [];
 
   const tableHeaders: TableHeader[] = [
-
     { key: "product_id", label: "Product ID" },
     { key: "product_name", label: "Product Name" },
     { key: "varient_name", label: "Varient Name" },
     { key: "category_name", label: "Category Name" },
     { key: "subcategory_name", label: "subcategory_name" },
+    { key: "subcategory_id", label: "subcategory_id" },
     { key: "maximum_retail_price", label: "MRP" },
     { key: "discounted_selling_price", label: "discounted_selling_price" },
     { key: "stock_at_darkstores", label: "stock_at_darkstores" },
@@ -213,10 +208,8 @@ function Analytics() {
     { key: "ad_orders", label: "ad_orders" },
     { key: "ad_orders_othersku", label: "ad_orders_othersku" },
     { key: "ad_orders_samesku", label: "ad_orders_samesku" },
-    { key: "stock_on_hand_sellable", label: "stock_on_hand_sellable" },
   ];
   const tableHeadersSum: TableHeader[] = [
-
     { key: "product_id", label: "Product ID" },
     { key: "product_name", label: "Product Name" },
     { key: "varient_name", label: "Varient Name" },
@@ -238,7 +231,6 @@ function Analytics() {
     { key: "ad_orders", label: "ad_orders" },
     { key: "ad_orders_othersku", label: "ad_orders_othersku" },
     { key: "ad_orders_samesku", label: "ad_orders_samesku" },
-    { key: "stock_on_hand_sellable", label: "stock_on_hand_sellable" },
   ];
 
   const [showFilters, setShowFilters] = useState(false);
@@ -266,7 +258,7 @@ function Analytics() {
     // const newDimensionInput: string[] = [];
     // const newMetricInput: string[] = [];
     const columnsSelected: string[] = [];
-    const metricsSelcted: string[] = ["category_name","product_id"];
+    const metricsSelcted: string[] = ["category_name", "product_id"];
     Object.entries(selectedDimensions).forEach(([key, value]) => {
       if (value) {
         columnsSelected.push(key);
@@ -287,18 +279,21 @@ function Analytics() {
     const groupData = true;
     try {
       // Wait for the POST request to complete
-      const result = await axios.post("http://localhost:5001/datewises", {
-        from: "2025-01-20",
-        to: "2025-01-20",
-        metric: metricsSelcted,
-      });
+      const result = await axios.post(
+        "http://localhost:5001/datewisesSubCategory",
+        {
+          from: "2025-01-20",
+          to: "2025-01-20",
+          metric: metricsSelcted,
+        }
+      );
 
       // Log the response
       // console.log(result.data.data);
       console.log(result);
       setData(result.data.data);
-      setDataSummary(result.data.summary)
-      console.log(dataSummary)
+      setDataSummary(result.data.summary);
+      console.log(dataSummary);
     } catch (error) {
       // Log any errors
       console.log("Error at post request", error);
@@ -343,22 +338,18 @@ function Analytics() {
       try {
         // Send POST request with proper JSON data
         const result = await axios.post(
-          "http://localhost:5001/datewises",
+          "http://localhost:5001/datewisesSubCategory",
           {
             from: "2025-01-20",
             to: "2025-01-22",
-            metric: [
-              "category_name",
-              "product_id"
-            ],
-            
+            metric: ["category_name", "product_id"],
           } // JSON object
         );
 
         // Log the response
         setData(result.data.data);
-        setDataSummary(result.data.summary)
-        console.log(dataSummary)
+        setDataSummary(result.data.summary);
+        console.log(dataSummary);
 
         console.log("Response from backend:", result.data.data);
         // console.log;
@@ -385,7 +376,7 @@ function Analytics() {
               animate={{ opacity: 1 }}
               className="text-[14px] text-center rounded-[10px] hover:cursor-pointer flex items-center bg-white shadow-1 dark:bg-gray-dark dark:shadow-card p-1 whitespace-nowrap"
             >
-              <DatePickerWithRange data={handleData} />
+              <DatePickerWithRangeSubCategory data={handleData} />
             </motion.div>
 
             <motion.div
@@ -502,7 +493,7 @@ function Analytics() {
             tableHeaders={tableHeaders}
             visibleColumns={visibleColumns}
             data={data}
-            datas = {dataSummary}
+            datas={dataSummary}
           />
         </div>
       </div>
@@ -510,4 +501,4 @@ function Analytics() {
   );
 }
 
-export default Analytics;
+export default AnalyticsSub;
