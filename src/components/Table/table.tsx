@@ -61,7 +61,7 @@ function Table({ tableHeaders, visibleColumns, data }) {
                                         <th
                                             key={header.key}
                                             className={`
-                      text-center p-2 border-b relative
+                      text-left p-2 border-b relative
                       ${index === 0 ? 'sticky left-0 z-30 bg-white shadow-1 dark:bg-gray-dark dark:shadow-card' : ''}
                     `}
                                             style={{
@@ -87,7 +87,7 @@ function Table({ tableHeaders, visibleColumns, data }) {
                                         visibleColumns[header.key] && (
                                             <td
                                             key={`${rowIndex}-${header.key}`}
-                                            className="p-2 border-b text-center"
+                                            className="p-2 border-b"
                                             >
                                     {formatValue(row[header.key], header.key)}
                                     </td>
