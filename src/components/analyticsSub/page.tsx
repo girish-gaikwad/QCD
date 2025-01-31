@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
-import { DatePickerWithRange } from "@/components/datepicker";
+import { SlidersHorizontal } from "lucide-react";
+import { DatePickerWithRangeSubCategory } from "@/components/datepickerSub";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import Table from "@/components/Table/table";
@@ -30,7 +30,6 @@ const metrics = [
   { id: "ad_orders_othersku", label: "ad_orders_othersku" },
   { id: "ad_orders_samesku", label: "ad_orders_samesku" },
   { id: "ad_revenue", label: "ad_revenue" },
-  { id: "stock_on_hand_sellable", label: "Ad CVR% (Conversion Rate)" },
 ];
 
 const dimensions = [
@@ -38,115 +37,9 @@ const dimensions = [
   { id: "product_name", label: "Product Name" },
   { id: "category_name", label: "Category" },
 ];
-
-const category_names = ["Electronics & Appliances", "Kitchen & Dining"];
+;
 // "Home Needs","Toys & Sports","Kitchen & Dining","Pharma & Wellness","Apparel & Lifestyle"
-
-const PaginationControls = ({
-  currentPage,
-  pageSize,
-  totalItems,
-  onPageChange,
-  onPageSizeChange,
-  isLoading
-}) => {
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startItem = (currentPage - 1) * pageSize + 1;
-  const endItem = Math.min(currentPage * pageSize, totalItems);
-
-  const getPageRange = () => {
-    const pages = [];
-    let start = Math.max(1, currentPage - 2);
-    let end = Math.min(totalPages, start + 4);
-    
-    if (end - start < 4) {
-      start = Math.max(1, end - 4);
-    }
-    
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
-
-  return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4 p-4 bg-white rounded-lg shadow dark:bg-gray-800">
-      <div className="flex items-center gap-4 w-full sm:w-auto">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-300">Rows per page:</span>
-          <select
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="border rounded p-1 bg-white dark:bg-gray-700 dark:border-gray-600"
-            disabled={isLoading}
-          >
-            {[10, 25, 50, 100].map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
-        <span className="text-sm text-gray-600 dark:text-gray-300">
-          {totalItems > 0 ? `${startItem}-${endItem} of ${totalItems}` : 'No items'}
-        </span>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onPageChange(1)}
-          disabled={currentPage === 1 || isLoading}
-          className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-        >
-          First
-        </button>
-        
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1 || isLoading}
-          className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-        >
-          <ChevronLeft size={20} />
-        </button>
-
-        <div className="flex gap-1">
-          {getPageRange().map(page => (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              disabled={isLoading}
-              className={`px-3 py-1 rounded ${
-                page === currentPage
-                  ? 'bg-blue-600 text-white'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages || isLoading}
-          className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-        >
-          <ChevronRight size={20} />
-        </button>
-
-        <button
-          onClick={() => onPageChange(totalPages)}
-          disabled={currentPage >= totalPages || isLoading}
-          className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-        >
-          Last
-        </button>
-      </div>
-    </div>
-  );
-};
-
-
-
-function Analytics() {
+function AnalyticsSub() {
   type VisibleColumns = {
     atc: boolean;
     orders: boolean;
@@ -194,23 +87,26 @@ function Analytics() {
     label: string;
   }
   const [visibleColumns, setVisibleColumns] = useState<VisibleColumns>({
-    maximum_retail_price: false,
-    discounted_selling_price: false,
-    stock_at_darkstores: false,
-    stock_at_warehouses: false,
-    total_orders: false,
-    total_mrp_revenue: false,
-    gross_selling_value: false,
-    total_final_revenue: false,
-    ad_revenue: false,
-    ad_spend: false,
-    ad_impressions: false,
-    ad_clicks: false,
-    ad_add_to_carts: false,
-    ad_orders: false,
-    ad_orders_othersku: false,
-    ad_orders_samesku: false,
-    stock_on_hand_sellable: false, // Removed label mismatch
+    category_name: true,
+    discounted_selling_price: true,
+    subcategory_name: true,
+    subcategory_id: true,
+    maximum_retail_price: true,
+    stock_at_darkstores: true,
+    stock_at_warehouses: true,
+    total_orders: true,
+    total_mrp_revenue: true,
+    gross_selling_value: true,
+    total_final_revenue: true,
+    ad_revenue: true,
+    ad_spend: true,
+    ad_impressions: true,
+    ad_clicks: true,
+    ad_add_to_carts: true,
+    ad_orders: true,
+    ad_orders_othersku: true,
+    ad_orders_samesku: true,
+    // Removed label mismatch
   });
 
   const [selectedMetrics, setSelectedMetrics] = useState<MetricsState>({
@@ -230,20 +126,13 @@ function Analytics() {
     ad_orders: false,
     ad_orders_othersku: false,
     ad_orders_samesku: false,
-    stock_on_hand_sellable: false,
   });
 
   const [selectedDimensions, setSelectedDimensions] = useState<DimensionState>({
-    product_id: true,
-    product_name: true,
     category_name: true,
-    subcategory_name:true
+    subcategory_name: true,
+    subcategory_id: true,
   });
-
- // Add pagination state
- const [currentPage, setCurrentPage] = useState(1);
- const [pageSize, setPageSize] = useState(10);
- const [totalItems, setTotalItems] = useState(0);
 
   // let data: Product[] = [];
   const [data, setData] = useState<Product[]>([
@@ -270,10 +159,57 @@ function Analytics() {
       processed_date: "2025-01-18",
     },
   ]);
+  const [dataSummary, setDataSummary] = useState<Product[]>([
+    {
+      productid: "f2cd647c-239f-4258-b8cc-943131a355b1",
+      productname:
+        "Lifelong 2-in1 Egg Boiler and Poacher 500-Watt (Black), Boil 8 eggs, Poach 4 eggs, 3 Boiling Modes",
+      brandid: "72637924-4a0c-4391-9e63-4cda2d401e01",
+      brandname: "Lifelong",
+      atc: 1,
+      campaign_id: 2023706,
+      campaign_name: "Lifelong-Electronics PCA Jan",
+      category: "Kitchen Appliances",
+      clicks: 18,
+      cpm: 700,
+      ctr: 0.79,
+      impressions: 2287,
+      orders: 6,
+      other_skus: 6,
+      revenue: 16588,
+      roas: 10.36,
+      same_skus: 0,
+      spend: 1601,
+      processed_date: "2025-01-18",
+    },
+  ]);
   // const data: Product[] = [];
 
   const tableHeaders: TableHeader[] = [
-
+    { key: "product_id", label: "Product ID" },
+    { key: "product_name", label: "Product Name" },
+    { key: "varient_name", label: "Varient Name" },
+    { key: "category_name", label: "Category Name" },
+    { key: "subcategory_name", label: "subcategory_name" },
+    { key: "subcategory_id", label: "subcategory_id" },
+    { key: "maximum_retail_price", label: "MRP" },
+    { key: "discounted_selling_price", label: "discounted_selling_price" },
+    { key: "stock_at_darkstores", label: "stock_at_darkstores" },
+    { key: "stock_at_warehouses", label: "Average Discostock_at_warehouses" },
+    { key: "total_orders", label: "total_orders" },
+    { key: "total_mrp_revenue", label: "total_mrp_revenue" },
+    { key: "gross_selling_value", label: "Total Revenue" },
+    { key: "ad_revenue", label: "Ad Revenue" },
+    { key: "total_final_revenue", label: "total_final_revenue" },
+    { key: "ad_spend", label: "ad_spend" },
+    { key: "ad_impressions", label: "ad_impressions" },
+    { key: "ad_clicks", label: "ad_clicks" },
+    { key: "ad_add_to_carts", label: "ad_add_to_carts" },
+    { key: "ad_orders", label: "ad_orders" },
+    { key: "ad_orders_othersku", label: "ad_orders_othersku" },
+    { key: "ad_orders_samesku", label: "ad_orders_samesku" },
+  ];
+  const tableHeadersSum: TableHeader[] = [
     { key: "product_id", label: "Product ID" },
     { key: "product_name", label: "Product Name" },
     { key: "varient_name", label: "Varient Name" },
@@ -295,7 +231,6 @@ function Analytics() {
     { key: "ad_orders", label: "ad_orders" },
     { key: "ad_orders_othersku", label: "ad_orders_othersku" },
     { key: "ad_orders_samesku", label: "ad_orders_samesku" },
-    { key: "stock_on_hand_sellable", label: "stock_on_hand_sellable" },
   ];
 
   const [showFilters, setShowFilters] = useState(false);
@@ -309,19 +244,61 @@ function Analytics() {
 
   const [metricsSelcted, setMetrcsSelected] = useState<any>(["category_name"]);
 
- 
+  const applySelection = async () => {
+    const updatedVisibleColumns = { ...visibleColumns };
 
-  // const handlePageChange = (newPage: number) => {
-  //   setCurrentPage(newPage);
-  //   applySelection(); // Fetch data for new page
-  // };
+    Object.entries(selectedMetrics).forEach(([key, value]) => {
+      updatedVisibleColumns[key] = value;
+    });
+    Object.entries(selectedDimensions).forEach(([key, value]) => {
+      updatedVisibleColumns[key] = value;
+    });
+    setVisibleColumns(updatedVisibleColumns);
 
-  // // Add function to handle page size changes
-  // const handlePageSizeChange = (newSize: number) => {
-  //   setPageSize(newSize);
-  //   setCurrentPage(1); // Reset to first page when changing page size
-  //   applySelection();
-  // };
+    // const newDimensionInput: string[] = [];
+    // const newMetricInput: string[] = [];
+    const columnsSelected: string[] = [];
+    const metricsSelcted: string[] = ["category_name", "product_id"];
+    Object.entries(selectedDimensions).forEach(([key, value]) => {
+      if (value) {
+        columnsSelected.push(key);
+      }
+    });
+    Object.entries(selectedMetrics).forEach(([key, value]) => {
+      if (value) {
+        columnsSelected.push(key);
+        metricsSelcted.push(key);
+      }
+    });
+    setMetrcsSelected(...metricsSelcted);
+
+    // console.log(columnsSelected);
+    // console.log(visibleColumns);
+    // const groupData = evaluateGroupdata();
+    // console.log(groupData);
+    const groupData = true;
+    try {
+      // Wait for the POST request to complete
+      const result = await axios.post(
+        "http://localhost:5001/datewisesSubCategory",
+        {
+          from: "2025-01-20",
+          to: "2025-01-20",
+          metric: metricsSelcted,
+        }
+      );
+
+      // Log the response
+      // console.log(result.data.data);
+      console.log(result);
+      setData(result.data.data);
+      setDataSummary(result.data.summary);
+      console.log(dataSummary);
+    } catch (error) {
+      // Log any errors
+      console.log("Error at post request", error);
+    }
+  };
 
   const formatValue = (value, key) => {
     if (typeof value === "number") {
@@ -352,128 +329,41 @@ function Analytics() {
 
   const handleData = (event: any) => {
     console.log(event);
-    setData(event);
+    setData(event.main);
+    setDataSummary(event.sum);
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const result = await axios.post(
-  //         "http://localhost:5001/datewises",
-  //         {
-  //           from: "2025-01-20",
-  //           to: "2025-01-22",
-  //           cond: false,
-  //           metric: [
-  //             "category_name",
-  //             "product_id"
-  //           ],
-  //           category_names: category_names,
-  //           offset: (currentPage - 1) * pageSize,
-  //           limit: pageSize
-  //         }
-  //       );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Send POST request with proper JSON data
+        const result = await axios.post(
+          "https://qc-dbackend-git-main-girish-gaikwads-projects.vercel.app/datewisesSubCategory",
+          {
+            from: "2025-01-20",
+            to: "2025-01-22",
+            metric: ["category_name", "product_id"],
+          } // JSON object
+        );
 
-  //       setData(result.data.data);
-  //       setTotalItems(result.data.total || 0);
-  //     } catch (error) {
-  //       console.error("Error at POST request:", error);
-  //     }
-  //   };
+        // Log the response
+        setData(result.data.data);
+        setDataSummary(result.data.summary);
+        console.log(dataSummary);
 
-  //   fetchData();
-  // }, [currentPage, pageSize]);
+        console.log("Response from backend:", result.data.data);
+        // console.log;
+      } catch (error) {
+        // Log any errors
+        console.error("Error at POST request:", error);
+      }
+    };
+
+    fetchData(); // Call the async function
+  }, []);
 
   // console.log(data, "data");
 
-  const[isLoading, setIsLoading] = useState(true);
-
-
-  const fetchData = async (page: number, size: number) => {
-    setIsLoading(true);
-    try {
-      const result = await axios.post("http://localhost:5001/datewises", {
-        from: "2025-01-20",
-        to: "2025-01-22",
-        cond: false,
-        metric: metricsSelcted,
-        category_names: category_names,
-        offset: (page - 1) * size,
-        limit: size
-      });
-
-      setData(result.data.data);
-      setTotalItems(result.data.pagination.total || 0);
-      setCurrentPage(result.data.pagination.currentPage || 1);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePageChange = (newPage: number) => {
-    fetchData(newPage, pageSize);
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    fetchData(1, newSize);
-  };
-
-  const applySelection = async () => {
-    const updatedVisibleColumns = { ...visibleColumns };
-
-    Object.entries(selectedMetrics).forEach(([key, value]) => {
-      updatedVisibleColumns[key] = value;
-    });
-    Object.entries(selectedDimensions).forEach(([key, value]) => {
-      updatedVisibleColumns[key] = value;
-    });
-    setVisibleColumns(updatedVisibleColumns);
-
-    const columnsSelected: string[] = [];
-    const metricsSelcted: string[] = ["category_name", "product_id"];
-    
-    Object.entries(selectedDimensions).forEach(([key, value]) => {
-      if (value) {
-        columnsSelected.push(key);
-      }
-    });
-    Object.entries(selectedMetrics).forEach(([key, value]) => {
-      if (value) {
-        columnsSelected.push(key);
-        metricsSelcted.push(key);
-      }
-    });
-    setMetrcsSelected(...metricsSelcted);
-
-    const groupData = true;
-    
-    try {
-      setIsLoading(true);
-      const result = await axios.post("http://localhost:5001/datewises", {
-        from: "2025-01-02",
-        to: "2025-01-12",
-        cond: groupData,
-        metric: metricsSelcted,
-        category_names: category_names,
-        offset: (currentPage - 1) * pageSize,
-        limit: pageSize
-      });
-
-      setData(result.data.data);
-      setCurrentPage(result.data.pagination.currentPage || 1);
-      setTotalItems(result.data.total || 0);
-    } catch (error) {
-      console.error("Error applying selection:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchData(currentPage, pageSize);
-  }, []); 
   // const { chartTypes, chartType, setChartType } = useSampleStore();
   return (
     <div className="flex-1 relative z-10">
@@ -486,7 +376,7 @@ function Analytics() {
               animate={{ opacity: 1 }}
               className="text-[14px] text-center rounded-[10px] hover:cursor-pointer flex items-center bg-white shadow-1 dark:bg-gray-dark dark:shadow-card p-1 whitespace-nowrap"
             >
-              <DatePickerWithRange data={handleData} />
+              <DatePickerWithRangeSubCategory data={handleData} />
             </motion.div>
 
             <motion.div
@@ -599,30 +489,16 @@ function Analytics() {
         </div>
 
         <div>
-        <Table
-          tableHeaders={tableHeaders}
-          visibleColumns={visibleColumns}
-          data={data}
-        />
-        
-        {isLoading && (
-          <div className="flex justify-center my-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-        )}
-        
-        <PaginationControls
-          currentPage={currentPage}
-          pageSize={pageSize}
-          totalItems={totalItems}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          isLoading={isLoading}
-        />
-      </div>
+          <Table
+            tableHeaders={tableHeaders}
+            visibleColumns={visibleColumns}
+            data={data}
+            datas={dataSummary}
+          />
+        </div>
       </div>
     </div>
   );
 }
 
-export default Analytics;
+export default AnalyticsSub;

@@ -23,7 +23,7 @@ interface DatePickerWithRangeProps
   data: any;
   cond: any; // Replace `any` with a specific type for `data`, depending on your use case
 }
-export function DatePickerWithRange({
+export function DatePickerWithRangeSubCategory({
   className,
   data,
 }: DatePickerWithRangeProps) {
@@ -59,7 +59,7 @@ export function DatePickerWithRange({
     try {
       // Wait for the POST request to complete
       const payLoad = { ...tempDate, metric };
-      const result = await axios.post("http://localhost:5001/datewises", payLoad);
+      const result = await axios.post("http://localhost:5001/datewisesSubCategory", payLoad);
 
       // Log the response
       console.log(result);
