@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
-import AnalyticsCategory from "@/components/AnalyticsCategory/page";
+import AnalyticsCategory from "@/components/analyticsCategory/page";
 
 export const metadata: Metadata = {
   title: "Next.js Profile Page | NextAdmin - Next.js Dashboard Kit",
